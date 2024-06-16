@@ -43,19 +43,30 @@ const inscriptionId: string =
   "0fbde4c394f144c44b1e59465f58766359d1b086415b2a02881cd1f1477ccc5fi0";
 
 const memeType: string = "text/html;charset=utf-8";
-const contentBufferData: Buffer = contentBuffer(`<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Build Your Own Recursive Ordinal</title>
-  </head>
-  <body style="margin: 0px">
-    <div>
-      <img style="width:100%;margin:0px" src="/content/${inscriptionId}" />
-    </div>
-  </body>
-</html>`);
+const contentBufferData: Buffer = contentBuffer(`
+  var css = document.createElement("style");
+
+  css.innerHTML = "body, video {height: 100%; width: auto; margin: 0; text-align: center;}";
+  document.head.appendChild(css);
+  
+  const video = document.createElement('video');
+  video.src = '/content/${inscriptionId}';
+  video.loop = true;
+  video.muted = true;
+  video.autoplay = true; // Ensure autoplay is set
+  video.playsInline = true; // Important for iOS
+  
+  video.addEventListener('canplaythrough', function() {
+    video.play();
+  });
+  
+  // Use DOMContentLoaded to ensure the body is ready
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() {
+      document.body.appendChild(video);
+    }, 0);
+  });
+`);
 
 const splitBuffer = (buffer: Buffer, chunkSize: number) => {
   let chunks = [];
